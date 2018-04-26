@@ -74,6 +74,26 @@ public class MachineModel {
         	cpu.instructionPointer += memory.getData(cpu.memoryBase + arg);
 		});
         
+      //INSTRUCTION_MAP entry for "JUMPI"
+        INSTRUCTIONS.put(0x8, arg -> {
+        	cpu.instructionPointer = arg;
+		});
+        
+      //INSTRUCTION_MAP entry for "JMPZR"
+        INSTRUCTIONS.put(0x9, arg -> {
+        	if(cpu.accumulator == 0) cpu.instructionPointer += arg;
+		});
+        
+      //INSTRUCTION_MAP entry for "JMPZ"
+        INSTRUCTIONS.put(0xA, arg -> {
+        	if(cpu.accumulator == 0)	cpu.instructionPointer += memory.getData(cpu.memoryBase + arg);
+		});
+        
+      //INSTRUCTION_MAP entry for "JMPZI"
+        INSTRUCTIONS.put(0xB, arg -> {
+        	if(cpu.accumulator == 0)	cpu.instructionPointer = arg;
+		});
+        
         //
 		//INSTRUCTION_MAP entry for "ADDI"
         INSTRUCTIONS.put(0xC, arg -> {
@@ -161,5 +181,87 @@ public class MachineModel {
             cpu.accumulator /= arg2;
             cpu.incrementIP(1);
         });
+        
+        //INSTRUCTION_MAP entry for "ANDI"
+        INSTRUCTIONS.put(0x18, arg -> {
+        	if(cpu.accumulator != 0 && arg != 0) {
+        		cpu.accumulator = 1;
+        	} else cpu.accumulator = 0;
+        	cpu.incrementIP(1);
+        });
+        
+      //INSTRUCTION_MAP entry for "AND"
+        INSTRUCTIONS.put(0x19, arg -> {
+        	if(cpu.accumulator != 0 && memory.getData(cpu.memoryBase+arg) != 0) {
+        		cpu.accumulator = 1;
+        	} else cpu.accumulator = 0;
+        	cpu.incrementIP(1);
+        });
+        
+      //INSTRUCTION_MAP entry for "NOT"
+        INSTRUCTIONS.put(0x1A, arg -> {
+        	if(cpu.accumulator == 0) {
+        		cpu.accumulator = 1;
+        	} else cpu.accumulator = 0;
+        	cpu.incrementIP(1);
+        });
+        
+      //INSTRUCTION_MAP entry for "CMPL"
+        INSTRUCTIONS.put(0x1B, arg -> {
+        if(memory.getData(cpu.memoryBase+arg) < 0) {
+        		cpu.accumulator = 1;
+        } else cpu.accumulator = 0;
+        	cpu.incrementIP(1);
+        });
+
+      //INSTRUCTION_MAP entry for "CMPZ"
+        INSTRUCTIONS.put(0x1C, arg -> {
+        if(memory.getData(cpu.memoryBase+arg) == 0) {
+        		cpu.accumulator = 1;
+        } else cpu.accumulator = 0;
+        	cpu.incrementIP(1);
+        });
+        
+      //INSTRUCTION_MAP entry for "HALT"
+        INSTRUCTIONS.put(0x1F, arg -> {
+        callback.halt();
+        });
 	}
+
+	public int getData(int index) {
+		return memory.getData(index);
+	}
+
+	public void setData(int index, int value) {
+		memory.setData(index, value);
+	}
+	
+	public void setAccumulator(int accum) {
+		cpu.accumulator = accum;
+	}
+	
+	public int getAccumulator() {
+		return cpu.accumulator;
+	}
+	
+	public void setInstructionPointer(int ip) {
+		cpu.instructionPointer = ip;
+	}
+	
+	public int getInstuctionPointer() {
+		return cpu.instructionPointer;
+	}
+	
+	public void setMemoryBase(int mb) {
+		cpu.memoryBase = mb;
+	}
+	
+	public int getMemoryBase() {
+		return cpu.memoryBase;
+	}
+	
+	public Instruction get(int index) {
+		return INSTRUCTIONS.get(index);
+	}
+	
 }
